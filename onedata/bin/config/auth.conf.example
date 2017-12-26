@@ -1,0 +1,77 @@
+[
+    % Example file for configuring authorization with Onezone
+    % The commended sections '%' disable desiganted authentication methods
+    % on the Onezone portal. To enable authoization method, uncommend one of the sections
+    % and provider proper app_id and app_secret values.
+    % This file is a list, remeber to place commas ',' in the right places!
+
+    {basicAuth, [
+    ]}
+    %,
+   
+    %{google, [
+        %% Standard config
+    %    {auth_module, auth_google},
+    %    {app_id, <<"480003446090-rhtr4orrtjnd88rsp3td9lbp6rmpsbjs.apps.googleusercontent.com">>},
+    %    {app_secret, <<"H55YOTh7EpKFJubmHMLyzvd9">>},
+        %% Provider specific config
+    %    {xrds_endpoint, <<"https://accounts.google.com/.well-known/openid-configuration">>}
+
+    %]}
+    %,
+
+    %{facebook, [
+        %% Standard config
+    %    {auth_module, auth_facebook},
+    %    {app_id, <<"567033636796512">>},
+    %    {app_secret, <<"31ca17d45fb6883f450d518c9ac04a85">>},
+        %% Provider specific config
+    %    {authorize_endpoint, <<"https://www.facebook.com/dialog/oauth">>},
+    %    {access_token_endpoint, <<"https://graph.facebook.com/oauth/access_token">>},
+    %    {user_info_endpoint, <<"https://graph.facebook.com/me">>}
+    %]}
+    %,
+
+    %{github, [
+        %% Standard config
+    %    {auth_module, auth_github},
+    %    {app_id, <<"81eebcc718c392e0e782">>},
+    %    {app_secret, <<"3b4842fae16e9df2af2f87070067aa5b8a2c5b2f">>},
+        %% Provider specific config
+    %    {authorize_endpoint, <<"https://github.com/login/oauth/authorize">>},
+    %    {access_token_endpoint, <<"https://github.com/login/oauth/access_token">>},
+    %    {user_info_endpoint, <<"https://api.github.com/user">>},
+    %    {user_emails_endpoint, <<"https://api.github.com/user/emails">>}
+    %]}
+    %,
+
+    %{dropbox, [
+    %    {auth_module, auth_dropbox},
+    %    {app_id, <<"z0hi27usr36tgin">>},
+    %    {app_secret, <<"kyrf8vked9nm9xn">>},
+        %% Provider specific config
+    %    {authorize_endpoint, <<"https://www.dropbox.com/1/oauth2/authorize">>},
+    %    {access_token_endpoint, <<"https://api.dropbox.com/1/oauth2/token">>},
+    %    {user_info_endpoint, <<"https://api.dropbox.com/1/account/info">>}
+
+    %]}
+    %,
+
+    %{plgrid, [
+        %% Standard config
+    %    {auth_module, auth_plgrid},
+        %% Provider specific config
+    %    {xrds_endpoint, <<"https://openid.plgrid.pl/gateway">>},
+    %    {logout_endpoint, <<"https://openid.plgrid.pl/logout">>}
+    %]}
+    %,
+    
+    %{indigo, [
+    %    {auth_module, auth_indigo},
+    %    {app_id, <<"111111111111">>},
+    %    {app_secret, <<"222222222222">>},
+        %% Provider specific config
+        %% Provider specific config
+    %    {xrds_endpoint, <<"https://iam-test.indigo-datacloud.eu/.well-known/openid-configuration">>}
+    %]}    
+].
