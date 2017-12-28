@@ -2,8 +2,14 @@
 
 apt-get update
 
-oneprovider_domain=`sed -n -e '/^ONEPROVIDER_DOMAIN/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
+oneprovider_version=`sed -n -e '/^ONEPROVIDER_VERSION/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
+if [ "$oneprovider_version"x != "3.0.0-rc16"x ]
+then
+    cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
+    sed -i "s/image: onedata\/onezone:3.0.0-rc16/image: onedata\/onezone:$oneprovider_version/" docker-compose-oneprovider.yml
+fi
 
+oneprovider_domain=`sed -n -e '/^ONEPROVIDER_DOMAIN/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
 if [ "$oneprovider_domain" != "NO_DOMAIN" ]
 then
     ping -c 1 -q $oneprovider_domain
