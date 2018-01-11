@@ -9,6 +9,7 @@ then
     sed -i "s/image: onedata\/onezone:3.0.0-rc16/image: onedata\/onezone:$oneprovider_version/" docker-compose-oneprovider.yml
 fi
 
+onezone_domain=`sed -n -e '/^ONEZONE_DOMAIN/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
 oneprovider_domain=`sed -n -e '/^ONEPROVIDER_DOMAIN/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
 if [ "$oneprovider_domain" != "NO_DOMAIN" ]
 then
@@ -71,4 +72,11 @@ do
 done
 
 cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
-echo n | ./run_onedata.sh --provider --name $host_name --zone-fqdn $onezone_ip --set-lat-long --provider-data-dir '/mnt/oneprovider_data' --detach
+
+if [ "$oneprovider_domain" != "NO_DOMAIN" ]
+then
+    echo n | ./run_onedata.sh --provider --name $host_name --zone-fqdn $onezone_domain --provider-fqdn $oneprovider_domain --set-lat-long --provider-data-dir '/mnt/oneprovider_data' --detach
+
+else
+    echo n | ./run_onedata.sh --provider --name $host_name --zone-fqdn $onezone_ip --set-lat-long --provider-data-dir '/mnt/oneprovider_data' --detach
+fi

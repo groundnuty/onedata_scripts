@@ -53,4 +53,10 @@ chmod +x /usr/local/bin/docker-compose
 host_name=`hostname | awk -F"." '{print $1}'`
 
 cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
-./run_onedata.sh --zone --name $host_name --detach
+
+if [ "$onezone_domain" != "NO_DOMAIN" ]
+then
+    echo n | ./run_onedata.sh --zone --name $host_name --zone-fqdn $onezone_domain --detach
+else
+    echo n | ./run_onedata.sh --zone --name $host_name --detach
+fi
