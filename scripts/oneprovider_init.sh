@@ -75,8 +75,35 @@ cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
 
 if [ "$oneprovider_domain" != "NO_DOMAIN" ]
 then
-    echo n | ./run_onedata.sh --provider --name $host_name --zone-fqdn $onezone_domain --provider-fqdn $oneprovider_domain --set-lat-long --provider-data-dir '/mnt/oneprovider_data' --detach
+    echo n | ./run_onedata.sh --provider --name $host_name --zone-fqdn $onezone_domain --provider-fqdn $oneprovider_domain --set-lat-long --provider-data-dir /mnt/oneprovider_data --detach
 
 else
-    echo n | ./run_onedata.sh --provider --name $host_name --zone-fqdn $onezone_ip --set-lat-long --provider-data-dir '/mnt/oneprovider_data' --detach
+    echo n | ./run_onedata.sh --provider --name $host_name --zone-fqdn $onezone_ip --set-lat-long --provider-data-dir /mnt/oneprovider_data --detach
+fi
+
+if [ -e /tmp/sfs.config ]
+then
+    while true
+    do
+        ret=`curl -k -i https://localhost:9443 | grep 'HTTP' | awk -F ' ' '{print $2}'`
+        echo $ret
+        if [ "$ret"x == "200"x ]
+        then
+            echo "oneprovider started"
+            break
+        else
+            echo "waiting oneprovider start"
+            sleep 5
+        fi
+    done
+
+    apt-get -y install nfs-common
+
+    cd  /root/scripts
+    sleep 30
+    /bin/bash sfs_storage_setup.sh
+
+    id=`docker ps -a | grep /root/oneprovider.sh | awk '{print $1}'`
+    docker restart $id
+
 fi
