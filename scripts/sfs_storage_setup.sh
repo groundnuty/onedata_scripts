@@ -21,6 +21,8 @@ SPACE_NAME_ARR=(${SFS_SPACE_NAMES//,/ })
 STORAGE_NAME_ARR=(${SFS_STORAGE_NAMES//,/ })
 SHARE_PATH_ARR=(${SHARE_PATHS//,/ })
 
+mount_point="mount_point"
+
 echo ${#SPACE_NAME_ARR[@]}
 for ((i=0;i<${#SPACE_NAME_ARR[@]};i++));do
     SFS_SPACE_NAME=${SPACE_NAME_ARR[$i]}
@@ -46,6 +48,7 @@ for ((i=0;i<${#SPACE_NAME_ARR[@]};i++));do
                 echo "Space name is "$space_name
                 mkdir -p /mnt/oneprovider_data/$space_id
                 chmod 777 /mnt/oneprovider_data/$space_id
+                mount_point="$mount_point,/mnt/oneprovider_data/$space_id"
                 break
             fi 
         else 
@@ -69,7 +72,7 @@ for ((i=0;i<${#SPACE_NAME_ARR[@]};i++));do
 
     for line in $storage_info
     do 
-        if [ $line != "," ]; then         
+        if [ $line != "," ]; then
             storage_name=`curl -u $ONEDATA_CREDS -sS --tlsv1.2 -k -H 'Content-type: application/json' -X GET "$ONEPANEL_URL/provider/storages/$line" | awk -F '\"' '{print $8}'`
      
             if [ "${storage_name}" == "${SFS_STORAGE_NAME}" ]; then 
@@ -99,3 +102,8 @@ for ((i=0;i<${#SPACE_NAME_ARR[@]};i++));do
     sleep 2
 
 done
+
+mount_point=`echo $mount_point | awk -F "mount_point," '{print $2}'`
+echo "MOUNT_POINT=$mount_point" >> /root/scripts/sfs.config
+
+grep 'SHARE_PATH' /tmp/sfs.config >> /root/scripts/sfs.config

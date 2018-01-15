@@ -107,3 +107,5 @@ then
     docker restart $id
 
 fi
+
+sed -i '/# By default this script does nothing./a\/root\/scripts\/oneprovider_auto_start.sh' /etc/rc.local

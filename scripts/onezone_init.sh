@@ -60,3 +60,5 @@ then
 else
     echo n | ./run_onedata.sh --zone --name $host_name --detach
 fi
+
+sed -i '/# By default this script does nothing./a\/root\/scripts\/onezone_auto_start.sh' /etc/rc.local
