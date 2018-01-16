@@ -1,6 +1,7 @@
 #! /bin/bash
-
+space_cofnig_file="/root/scripts/sfs.config"
 id=`docker ps -a | grep oneprovider | awk '{print $1}'`
+
 if [ "$1" == "1" ];then
     stats=`docker ps -a | grep oneprovider | awk '{print $7}'`
     if [ "$stats" != "Up" ];then
@@ -9,8 +10,65 @@ if [ "$1" == "1" ];then
         docker start $id >> /root/scripts/start.log
     fi
 
+    num=`df -h | grep 'sfs-nas1' | awk '{print $6}' | awk -F '/' '{print $4}' | wc -l`
+    if [ "$num" == "0" ];then
+        rm -f $space_cofnig_file
+        exit
+    else
+        mount="mount"
+        share="share"
+        for ((i=1;i<=$num;i++));do
+            space=`df -h | grep 'sfs-nas1' | awk '{print $6}' | awk -F '/' '{print $4}' | sed -n "$i"p`
+            resp=`curl -i -k -u admin:password https://localhost:9443/api/v3/onepanel/provider/spaces/$space | grep HTTP | awk '{print $2}'`
+            if [ "$resp" != "200" ]
+            then
+                umount "/mnt/oneprovider_data/$space"
+                rm -rf "/mnt/oneprovider_data/$space"
+                sed -i "s/,\/mnt\/oneprovider_data\/$space//g" $space_cofnig_file
+                sed -i "s/\/mnt\/oneprovider_data\/$space,//g" $space_cofnig_file
+                sed -i "s/\/mnt\/oneprovider_data\/$space//g" $space_cofnig_file
+                share_path=`df -h | grep 'sfs-nas1' | awk '{print $1}' | sed -n "$i"p`
+                share_path=`echo $share_path | awk -F '/' '{print $2}'`
+
+                sed -i "s/,sfs-nas1.eu-de.otc.t-systems.com:\/$share_path//g" $space_cofnig_file
+                sed -i "s/sfs-nas1.eu-de.otc.t-systems.com:\/$share_path,//g" $space_cofnig_file
+                sed -i "s/sfs-nas1.eu-de.otc.t-systems.com:\/$share_path//g" $space_cofnig_file
+            else
+
+                if [ -e "$space_cofnig_file" ];then
+                    grep "$space" $space_cofnig_file > /dev/null
+                    if [ "$?" == "1" ];then
+                        mount_point=`sed -n -e '/^MOUNT_POINT/p' $space_cofnig_file | awk -F "=" '{print $2}'`
+                        share_path=`sed -n -e '/^SHARE_PATH/p' $space_cofnig_file | awk -F "=" '{print $2}'`
+
+                        new_mount_point="/mnt/oneprovider_data/$space"
+                        new_share_path=`df -h | grep 'sfs-nas1' | awk '{print $1}' | sed -n "$i"p`
+                        mount_point="$mount_point,$new_mount_point"
+                        share_path="$share_path,$new_share_path"
+
+                        echo "MOUNT_POINT=$mount_point" > $space_cofnig_file
+                        echo "ONEDATA_CREDS=admin:password" >> $space_cofnig_file
+                        echo "SHARE_PATH=$share_path" >> $space_cofnig_file
+                    fi
+                else
+                    new_mount_point="/mnt/oneprovider_data/$space"
+                    new_share_path=`df -h | grep 'sfs-nas1' | awk '{print $1}' | sed -n "$i"p`
+                    mount="$mount,$new_mount_point"
+                    share="$share,$new_share_path"
+                fi
+            fi
+        done
+        if [ "$mount" != "mount" ];then
+            mount=`echo $mount | awk -F "mount," '{print $2}'`
+            share=`echo $share | awk -F "share," '{print $2}'`
+            echo "MOUNT_POINT=$mount" > $space_cofnig_file
+            echo "ONEDATA_CREDS=admin:password" >> $space_cofnig_file
+            echo "SHARE_PATH=$share" >> $space_cofnig_file
+        fi
+    fi
+
 else
-    space_cofnig_file="/root/scripts/sfs.config"
+    
 
     if [ -e "$space_cofnig_file" ];then
         share_path=`sed -n -e '/^SHARE_PATH/p' $space_cofnig_file | awk -F "=" '{print $2}'`

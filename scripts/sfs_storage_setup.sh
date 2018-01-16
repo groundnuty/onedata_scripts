@@ -105,5 +105,5 @@ done
 
 mount_point=`echo $mount_point | awk -F "mount_point," '{print $2}'`
 echo "MOUNT_POINT=$mount_point" >> /root/scripts/sfs.config
-echo "CREDS=$ONEDATA_CREDS" >> /root/scripts/sfs.config
+echo "ONEDATA_CREDS=$ONEDATA_CREDS" >> /root/scripts/sfs.config
 grep 'SHARE_PATH' /tmp/sfs.config >> /root/scripts/sfs.config
