@@ -62,3 +62,4 @@ else
 fi
 
 sed -i '/# By default this script does nothing./a\/root\/scripts\/onezone_auto_start.sh' /etc/rc.local
+echo '*  *    * * *   root    sleep 30; /bin/bash /root/scripts/onezone_auto_start.sh 1' >> /etc/crontab

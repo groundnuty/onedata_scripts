@@ -35,4 +35,3 @@ expect eof;"
 #Enable login with password
 sudo sed -i 's/^PasswordAuthentication.*$/PasswordAuthentication yes/' /etc/ssh/sshd_config
 sudo service ssh restart
-
