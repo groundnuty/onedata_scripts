@@ -11,14 +11,48 @@ if [ "$1" == "1" ];then
     fi
 
     num=`df -h | grep 'sfs-nas1' | awk '{print $6}' | awk -F '/' '{print $4}' | wc -l`
+    space_str=`df -h | grep 'sfs-nas1' | awk '{print $6}' | awk -F '/' '{print $4}'`
+    share_path_str=`df -h | grep 'sfs-nas1' | awk '{print $1}'`
+
     if [ "$num" == "0" ];then
-        rm -f $space_cofnig_file
+        if [ -e "$space_cofnig_file" ];then
+            share_path=`sed -n -e '/^SHARE_PATH/p' $space_cofnig_file | awk -F "=" '{print $2}'`
+            mount_point=`sed -n -e '/^MOUNT_POINT/p' $space_cofnig_file | awk -F "=" '{print $2}'`
+            creds=`sed -n -e '/^ONEDATA_CREDS/p' $space_cofnig_file | awk -F "=" '{print $2}'`
+
+            share_arr=(${share_path//,/ })
+            mount_arr=(${mount_point//,/ })
+
+            for ((i=0;i<${#share_arr[@]};i++));do
+                space=`echo ${mount_arr[$i]} | awk -F '/' '{print $4}'`
+                resp=`curl -i -k -u $creds https://localhost:9443/api/v3/onepanel/provider/spaces/$space | grep HTTP | awk '{print $2}'`
+                if [ "$resp" == "200" ]
+                then
+                    echo ${share_arr[$i]} ${mount_arr[$i]}
+                    mkdir -p ${mount_arr[$i]}
+                    chmod 777 ${mount_arr[$i]}
+                    mount -t  nfs ${share_arr[$i]} ${mount_arr[$i]}
+                else
+                    rm -rf ${mount_arr[$i]}
+                fi
+            done
+
+            if [ -z "$share_path" ];then
+                exit
+            fi
+            docker restart $id
+        fi
         exit
     else
         mount="mount"
         share="share"
+        space_arr=(${space_str//,/ })
+        share_path_arr=(${share_path_str//,/ })
+        
         for ((i=1;i<=$num;i++));do
-            space=`df -h | grep 'sfs-nas1' | awk '{print $6}' | awk -F '/' '{print $4}' | sed -n "$i"p`
+            space=${space_arr[$i]}
+            share_path=${share_path_arr[$i]}
+
             resp=`curl -i -k -u admin:password https://localhost:9443/api/v3/onepanel/provider/spaces/$space | grep HTTP | awk '{print $2}'`
             if [ "$resp" != "200" ]
             then
@@ -27,9 +61,8 @@ if [ "$1" == "1" ];then
                 sed -i "s/,\/mnt\/oneprovider_data\/$space//g" $space_cofnig_file
                 sed -i "s/\/mnt\/oneprovider_data\/$space,//g" $space_cofnig_file
                 sed -i "s/\/mnt\/oneprovider_data\/$space//g" $space_cofnig_file
-                share_path=`df -h | grep 'sfs-nas1' | awk '{print $1}' | sed -n "$i"p`
-                share_path=`echo $share_path | awk -F '/' '{print $2}'`
 
+                share_path=`echo $share_path | awk -F '/' '{print $2}'`
                 sed -i "s/,sfs-nas1.eu-de.otc.t-systems.com:\/$share_path//g" $space_cofnig_file
                 sed -i "s/sfs-nas1.eu-de.otc.t-systems.com:\/$share_path,//g" $space_cofnig_file
                 sed -i "s/sfs-nas1.eu-de.otc.t-systems.com:\/$share_path//g" $space_cofnig_file
@@ -38,11 +71,12 @@ if [ "$1" == "1" ];then
                 if [ -e "$space_cofnig_file" ];then
                     grep "$space" $space_cofnig_file > /dev/null
                     if [ "$?" == "1" ];then
+                        
                         mount_point=`sed -n -e '/^MOUNT_POINT/p' $space_cofnig_file | awk -F "=" '{print $2}'`
                         share_path=`sed -n -e '/^SHARE_PATH/p' $space_cofnig_file | awk -F "=" '{print $2}'`
 
                         new_mount_point="/mnt/oneprovider_data/$space"
-                        new_share_path=`df -h | grep 'sfs-nas1' | awk '{print $1}' | sed -n "$i"p`
+                        new_share_path=${share_path_arr[$i]}
                         mount_point="$mount_point,$new_mount_point"
                         share_path="$share_path,$new_share_path"
 
@@ -52,7 +86,7 @@ if [ "$1" == "1" ];then
                     fi
                 else
                     new_mount_point="/mnt/oneprovider_data/$space"
-                    new_share_path=`df -h | grep 'sfs-nas1' | awk '{print $1}' | sed -n "$i"p`
+                    new_share_path=${share_path_arr[$i]}
                     mount="$mount,$new_mount_point"
                     share="$share,$new_share_path"
                 fi
@@ -66,30 +100,4 @@ if [ "$1" == "1" ];then
             echo "SHARE_PATH=$share" >> $space_cofnig_file
         fi
     fi
-
-else
-    
-
-    if [ -e "$space_cofnig_file" ];then
-        share_path=`sed -n -e '/^SHARE_PATH/p' $space_cofnig_file | awk -F "=" '{print $2}'`
-        mount_point=`sed -n -e '/^MOUNT_POINT/p' $space_cofnig_file | awk -F "=" '{print $2}'`
-        creds=`sed -n -e '/^ONEDATA_CREDS/p' $space_cofnig_file | awk -F "=" '{print $2}'`
-
-        share_arr=(${share_path//,/ })
-        mount_arr=(${mount_point//,/ })
-
-        for ((i=0;i<${#share_arr[@]};i++));do
-            space=`echo ${mount_arr[$i]} | awk -F '/' '{print $4}'`
-            resp=`curl -i -k -u $creds https://localhost:9443/api/v3/onepanel/provider/spaces/$space | grep HTTP | awk '{print $2}'`
-            if [ "$resp" == "200" ]
-            then
-                echo ${share_arr[$i]} ${mount_arr[$i]}
-                mount -t  nfs ${share_arr[$i]} ${mount_arr[$i]}
-            else
-                rm -rf ${mount_arr[$i]}
-            fi
-        done
-    fi
-
-    docker restart $id
 fi
