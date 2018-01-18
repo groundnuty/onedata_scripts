@@ -108,5 +108,4 @@ then
 
 fi
 
-sed -i '/# By default this script does nothing./a\/root\/scripts\/oneprovider_auto_start.sh' /etc/rc.local
 echo '*  *    * * *   root    sleep 30; /bin/bash /root/scripts/oneprovider_auto_start.sh 1' >> /etc/crontab
