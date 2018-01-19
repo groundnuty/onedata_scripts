@@ -108,4 +108,5 @@ then
 
 fi
 
-echo '*  *    * * *   root    sleep 30; /bin/bash /root/scripts/oneprovider_auto_start.sh 1' >> /etc/crontab
+echo '*  *    * * *   root    sleep 10; /bin/bash /root/scripts/oneprovider_auto_start.sh 1' >> /etc/crontab
+echo '*  *    * * *   root    sleep 40; /bin/bash /root/scripts/oneprovider_auto_start.sh 1' >> /etc/crontab
