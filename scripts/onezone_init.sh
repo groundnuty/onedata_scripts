@@ -54,6 +54,7 @@ host_name=`hostname | awk -F"." '{print $1}'`
 
 cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
 
+#Start onezone
 if [ "$onezone_domain" != "NO_DOMAIN" ]
 then
     echo n | ./run_onedata.sh --zone --name $host_name --zone-fqdn $onezone_domain --detach
@@ -61,6 +62,5 @@ else
     echo n | ./run_onedata.sh --zone --name $host_name --detach
 fi
 
-sed -i '/# By default this script does nothing./a\/root\/scripts\/onezone_auto_start.sh' /etc/rc.local
 echo '*  *    * * *   root    sleep 10; /bin/bash /root/scripts/onezone_auto_start.sh 1' >> /etc/crontab
 echo '*  *    * * *   root    sleep 40; /bin/bash /root/scripts/onezone_auto_start.sh 1' >> /etc/crontab

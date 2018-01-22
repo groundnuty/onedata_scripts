@@ -73,6 +73,7 @@ done
 
 cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
 
+#Start oneprovider
 if [ "$oneprovider_domain" != "NO_DOMAIN" ]
 then
     echo n | ./run_onedata.sh --provider --name $host_name --zone-fqdn $onezone_domain --provider-fqdn $oneprovider_domain --set-lat-long --provider-data-dir /mnt/oneprovider_data --detach
@@ -103,7 +104,7 @@ then
     sleep 30
     /bin/bash sfs_storage_setup.sh
 
-    id=`docker ps -a | grep /root/oneprovider.sh | awk '{print $1}'`
+    id=`docker ps -a | grep oneprovider.sh | awk '{print $1}'`
     docker restart $id
 
 fi
