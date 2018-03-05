@@ -6,7 +6,7 @@ oneprovider_version=`sed -n -e '/^ONEPROVIDER_VERSION/p' /tmp/user-inject.data |
 if [ "$oneprovider_version"x != "3.0.0-rc16"x ]
 then
     cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
-    sed -i "s/image: onedata\/onezone:3.0.0-rc16/image: onedata\/onezone:$oneprovider_version/" docker-compose-oneprovider.yml
+    sed -i "s/image: onedata\/oneprovider:3.0.0-rc16/image: onedata\/oneprovider:$oneprovider_version/" docker-compose-oneprovider.yml
 fi
 
 onezone_domain=`sed -n -e '/^ONEZONE_DOMAIN/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
