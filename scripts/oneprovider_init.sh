@@ -3,38 +3,81 @@
 apt-get update
 
 oneprovider_version=`sed -n -e '/^ONEPROVIDER_VERSION/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
-if [ "$oneprovider_version"x != "17.06.0-rc8"x ]
-then
-    cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
-    sed -i "s/image: onedata\/oneprovider:17.06.0-rc8/image: onedata\/oneprovider:$oneprovider_version/" docker-compose-oneprovider.yml
-fi
-
 onezone_domain=`sed -n -e '/^ONEZONE_DOMAIN/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
 oneprovider_domain=`sed -n -e '/^ONEPROVIDER_DOMAIN/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
-if [ "$oneprovider_domain" != "NO_DOMAIN" ]
-then
-    ping -c 1 -q $oneprovider_domain
-    if [ $? -eq 0 ]
+
+if [[ $oneprovider_version =~ ^18.02.0- ]];then
+
+    rm -rf /home/ubuntu/onedata
+    mkdir -p /home/ubuntu/onedata
+    git clone https://github.com/onedata/getting-started /home/ubuntu/onedata
+
+    if [ "$oneprovider_version"x != "18.02.0-beta1"x ]
     then
-        #install certbot & create certs
-        apt-get -y install software-properties-common
-
-        echo "\n" | add-apt-repository ppa:certbot/certbot
-        apt-get update
-        apt-get -y install certbot
-
-        echo 'A' | certbot certonly --standalone -d $oneprovider_domain --register-unsafely-without-email
-
-        mkdir -p /opt/oneprovider/certs
-        cd /opt/oneprovider/certs
-        ln -s /etc/letsencrypt/live/$oneprovider_domain/chain.pem cacert.pem
-        ln -s /etc/letsencrypt/live/$oneprovider_domain/fullchain.pem cert.pem
-        ln -s /etc/letsencrypt/live/$oneprovider_domain/privkey.pem key.pem
-
         cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
-        sed -i 's/#- "${OP_PRIV_KEY_PATH}/- "\/opt\/oneprovider\/certs\/key.pem/' docker-compose-oneprovider.yml
-        sed -i 's/#- "${OP_CERT_PATH}/- "\/opt\/oneprovider\/certs\/cert.pem/' docker-compose-oneprovider.yml
-        sed -i 's/#- "${OP_CACERT_PATH}/- "\/opt\/oneprovider\/certs\/cacert.pem/g' docker-compose-oneprovider.yml
+        sed -i "s/image: onedata\/oneprovider:18.02.0-beta1/image: onedata\/oneprovider:$oneprovider_version/" docker-compose-oneprovider.yml
+    fi
+
+    if [ "$oneprovider_domain" != "NO_DOMAIN" ]
+    then
+        ping -c 1 -q $oneprovider_domain
+        if [ $? -eq 0 ]
+        then
+            #install certbot & create certs
+            apt-get -y install software-properties-common
+
+            echo "\n" | add-apt-repository ppa:certbot/certbot
+            apt-get update
+            apt-get -y install certbot
+
+            echo 'A' | certbot certonly --standalone -d $oneprovider_domain --register-unsafely-without-email
+
+            mkdir -p /opt/oneprovider/certs
+            cd /opt/oneprovider/certs
+            ln -s /etc/letsencrypt/live/$oneprovider_domain/chain.pem chain.pem
+            ln -s /etc/letsencrypt/live/$oneprovider_domain/cert.pem cert.pem
+            ln -s /etc/letsencrypt/live/$oneprovider_domain/privkey.pem key.pem
+
+            cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
+            sed -i 's/#- "${OP_PRIV_KEY_PATH}/- "\/opt\/oneprovider\/certs\/key.pem/' docker-compose-oneprovider.yml
+            sed -i 's/#- "${OP_CERT_PATH}/- "\/opt\/oneprovider\/certs\/cert.pem/' docker-compose-oneprovider.yml
+            sed -i 's/#- "${OZ_CHAIN_PATH}/- "\/opt\/oneprovider\/certs\/chain.pem/g' docker-compose-oneprovider.yml
+        fi
+    fi
+
+else
+    if [ "$oneprovider_version"x != "17.06.0-rc8"x ]
+    then
+        cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
+        sed -i "s/image: onedata\/oneprovider:17.06.0-rc8/image: onedata\/oneprovider:$oneprovider_version/" docker-compose-oneprovider.yml
+    fi
+
+
+    if [ "$oneprovider_domain" != "NO_DOMAIN" ]
+    then
+        ping -c 1 -q $oneprovider_domain
+        if [ $? -eq 0 ]
+        then
+            #install certbot & create certs
+            apt-get -y install software-properties-common
+
+            echo "\n" | add-apt-repository ppa:certbot/certbot
+            apt-get update
+            apt-get -y install certbot
+
+            echo 'A' | certbot certonly --standalone -d $oneprovider_domain --register-unsafely-without-email
+
+            mkdir -p /opt/oneprovider/certs
+            cd /opt/oneprovider/certs
+            ln -s /etc/letsencrypt/live/$oneprovider_domain/chain.pem cacert.pem
+            ln -s /etc/letsencrypt/live/$oneprovider_domain/fullchain.pem cert.pem
+            ln -s /etc/letsencrypt/live/$oneprovider_domain/privkey.pem key.pem
+
+            cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
+            sed -i 's/#- "${OP_PRIV_KEY_PATH}/- "\/opt\/oneprovider\/certs\/key.pem/' docker-compose-oneprovider.yml
+            sed -i 's/#- "${OP_CERT_PATH}/- "\/opt\/oneprovider\/certs\/cert.pem/' docker-compose-oneprovider.yml
+            sed -i 's/#- "${OP_CACERT_PATH}/- "\/opt\/oneprovider\/certs\/cacert.pem/g' docker-compose-oneprovider.yml
+        fi
     fi
 fi
 
@@ -45,10 +88,6 @@ apt-get -y install docker.io
 curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
-
-#Download oneprovider software
-#mkdir -p /home/ubuntu/oneprovider
-#git clone https://github.com/onedata/getting-started /home/ubuntu/onedata
 
 #Get Host Name and OneZone IP address
 host_name=`hostname | awk -F"." '{print $1}'`
