@@ -27,13 +27,13 @@ if [[ $onezone_version =~ ^18.02.0- ]];then
             then
                 python /root/obs/config.py
                 cd /root/
-                unzip onedata.zip
+                unzip onedata_cert.zip
 
                 mkdir -p /opt/onezone/certs
                 cd /opt/onezone/certs
-                ln -s /root/onedata/onezone/chain.pem chain.pem
-                ln -s /root/onedata/onezone/cert.pem cert.pem
-                ln -s /root/onedata/onezone/privkey.pem key.pem
+                ln -s /root/onedata_cert/onezone/chain.pem chain.pem
+                ln -s /root/onedata_cert/onezone/cert.pem cert.pem
+                ln -s /root/onedata_cert/onezone/privkey.pem key.pem
 
                 cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
                 sed -i 's/#- "${OZ_PRIV_KEY_PATH}/- "\/opt\/onezone\/certs\/key.pem/' docker-compose-onezone.yml
@@ -79,13 +79,13 @@ else
             then
                 python /root/obs/config.py
                 cd /root/
-                unzip onedata.zip
+                unzip onedata_cert.zip
 
                 mkdir -p /opt/onezone/certs
                 cd /opt/onezone/certs
-                ln -s /root/onedata/onezone/chain.pem cacert.pem
-                ln -s /root/onedata/onezone/cert.pem cert.pem
-                ln -s /root/onedata/onezone/privkey.pem key.pem
+                ln -s /root/onedata_cert/onezone/chain.pem cacert.pem
+                ln -s /root/onedata_cert/onezone/cert.pem cert.pem
+                ln -s /root/onedata_cert/onezone/privkey.pem key.pem
 
                 cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
                 sed -i 's/#- "${OZ_PRIV_KEY_PATH}/- "\/opt\/onezone\/certs\/key.pem/' docker-compose-onezone.yml
