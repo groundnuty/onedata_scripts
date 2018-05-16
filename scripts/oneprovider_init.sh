@@ -40,7 +40,7 @@ if [[ $oneprovider_version =~ ^18.02.0- ]];then
                 cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
                 sed -i 's/#- "${OP_PRIV_KEY_PATH}/- "\/opt\/oneprovider\/certs\/key.pem/' docker-compose-oneprovider.yml
                 sed -i 's/#- "${OP_CERT_PATH}/- "\/opt\/oneprovider\/certs\/cert.pem/' docker-compose-oneprovider.yml
-                sed -i 's/#- "${OZ_CHAIN_PATH}/- "\/opt\/oneprovider\/certs\/chain.pem/g' docker-compose-oneprovider.yml
+                sed -i 's/#- "${OP_CHAIN_PATH}/- "\/opt\/oneprovider\/certs\/chain.pem/g' docker-compose-oneprovider.yml
             else
                 #install certbot & create certs
                 apt-get -y install software-properties-common
@@ -60,7 +60,7 @@ if [[ $oneprovider_version =~ ^18.02.0- ]];then
                 cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
                 sed -i 's/#- "${OP_PRIV_KEY_PATH}/- "\/opt\/oneprovider\/certs\/key.pem/' docker-compose-oneprovider.yml
                 sed -i 's/#- "${OP_CERT_PATH}/- "\/opt\/oneprovider\/certs\/cert.pem/' docker-compose-oneprovider.yml
-                sed -i 's/#- "${OZ_CHAIN_PATH}/- "\/opt\/oneprovider\/certs\/chain.pem/g' docker-compose-oneprovider.yml
+                sed -i 's/#- "${OP_CHAIN_PATH}/- "\/opt\/oneprovider\/certs\/chain.pem/g' docker-compose-oneprovider.yml
             fi
         fi
     fi
