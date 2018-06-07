@@ -6,17 +6,18 @@ apt-get -y install python
 
 onezone_version=`sed -n -e '/^ONEZONE_VERSION/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
 onezone_domain=`sed -n -e '/^ONEZONE_DOMAIN/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
+email=`sed -n -e '/^EMAIL/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
 
 if [[ $onezone_version =~ ^18.02.0- ]];then
     rm -rf /home/ubuntu/onedata
     mkdir -p /home/ubuntu/onedata
     git clone https://github.com/onedata/getting-started /home/ubuntu/onedata
 
-    if [ "$onezone_version"x != "18.02.0-beta1"x ]
-    then
-        cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
-        sed -i "s/image: onedata\/onezone:18.02.0-beta1/image: onedata\/onezone:$onezone_version/" docker-compose-onezone.yml
-    fi
+    cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
+    sed -i "s/18.02.0.*/$onezone_version/" docker-compose-onezone.yml
+    sed -i 's/ONEPANEL_GENERATE_TEST_WEB_CERT: "true"/ONEPANEL_GENERATE_TEST_WEB_CERT: "false"/' docker-compose-onezone.yml
+    sed -i 's/ONEPANEL_GENERATED_CERT_DOMAIN: "node1.onezone"/ONEPANEL_GENERATED_CERT_DOMAIN: ""/' docker-compose-onezone.yml
+    sed -i 's/ONEPANEL_TRUST_TEST_CA: "true"/ONEPANEL_TRUST_TEST_CA: "false"/' docker-compose-onezone.yml
 
     if [ "$onezone_domain" != "NO_DOMAIN" ]
     then
@@ -47,7 +48,8 @@ if [[ $onezone_version =~ ^18.02.0- ]];then
                 apt-get update
                 apt-get -y install certbot
 
-                echo 'A' | certbot certonly --standalone -d $onezone_domain --register-unsafely-without-email
+                certbot certonly --standalone --agree-tos --test-cert -m $email -d $onezone_domain
+                echo '2' | certbot certonly --standalone --agree-tos -m $email -d $onezone_domain --eff-email
 
                 mkdir -p /opt/onezone/certs
                 cd /opt/onezone/certs
@@ -99,7 +101,8 @@ else
                 apt-get update
                 apt-get -y install certbot
 
-                echo 'A' | certbot certonly --standalone -d $onezone_domain --register-unsafely-without-email
+                certbot certonly --standalone --agree-tos --test-cert -m $email -d $onezone_domain
+                echo '2' | certbot certonly --standalone --agree-tos -m -d $onezone_domain --eff-email
 
                 mkdir -p /opt/onezone/certs
                 cd /opt/onezone/certs
