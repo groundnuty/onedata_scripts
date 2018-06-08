@@ -11,7 +11,7 @@ fi
 id=`docker ps -a | awk '{print $1}'`
 docker stop $id
 
-echo '2' | certbot certonly --standalone --agree-tos -m $email -d $domain
+echo '2' | certbot certonly --standalone --agree-tos --eff-email -m $email -d $domain
 
 if [ $? -eq 0 ];then
     id=`docker ps -a | awk '{print $1}'`

@@ -48,7 +48,7 @@ if [[ $onezone_version =~ ^18.02.0- ]];then
                 apt-get update
                 apt-get -y install certbot
 
-                certbot certonly --standalone --agree-tos --test-cert -m $email -d $onezone_domain
+                certbot certonly --standalone --agree-tos --test-cert -m $email -d $onezone_domain --eff-email
                 echo '2' | certbot certonly --standalone --agree-tos -m $email -d $onezone_domain --eff-email
 
                 mkdir -p /opt/onezone/certs
@@ -101,7 +101,7 @@ else
                 apt-get update
                 apt-get -y install certbot
 
-                certbot certonly --standalone --agree-tos --test-cert -m $email -d $onezone_domain
+                certbot certonly --standalone --agree-tos --test-cert -m $email -d $onezone_domain --eff-email
                 echo '2' | certbot certonly --standalone --agree-tos -m -d $onezone_domain --eff-email
 
                 mkdir -p /opt/onezone/certs

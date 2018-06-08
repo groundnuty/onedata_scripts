@@ -50,7 +50,7 @@ if [[ $oneprovider_version =~ ^18.02.0- ]];then
                 apt-get update
                 apt-get -y install certbot
 
-                certbot certonly --standalone --agree-tos --test-cert -m $email -d $oneprovider_domain
+                certbot certonly --standalone --agree-tos --test-cert -m $email -d $oneprovider_domain --eff-email
                 echo '2' | certbot certonly --standalone --agree-tos -m $email -d $oneprovider_domain --eff-email
 
                 mkdir -p /opt/oneprovider/certs
@@ -104,7 +104,7 @@ else
                 apt-get update
                 apt-get -y install certbot
 
-                certbot certonly --standalone --agree-tos --test-cert -m $email -d $oneprovider_domain
+                certbot certonly --standalone --agree-tos --test-cert -m $email -d $oneprovider_domain --eff-email
                 echo '2' | certbot certonly --standalone --agree-tos -m $email -d $oneprovider_domain --eff-email
 
                 mkdir -p /opt/oneprovider/certs
