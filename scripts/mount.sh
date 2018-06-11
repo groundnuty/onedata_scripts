@@ -18,7 +18,7 @@ for ((i=0;i<${#SPACE_NAME_ARR[@]};i++));do
     for line in $ids
     do
         if [ $line != "," ]; then
-            space_name=`curl -u admin:password -k  "https://localhost:9443/api/v3/onepanel/provider/spaces/$line" | jq '.name' | awk -F '\"' '{print$2}'``
+            space_name=`curl -u admin:password -k  "https://localhost:9443/api/v3/onepanel/provider/spaces/$line" | jq '.name' | awk -F '\"' '{print$2}'`
 
             if [ "$space_name" == "$space" ]; then
                 echo "Space name is "$space
