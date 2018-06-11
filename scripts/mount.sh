@@ -23,6 +23,23 @@ for ((i=0;i<${#SPACE_NAME_ARR[@]};i++));do
             if [ "$space_name" == "$space" ]; then
                 echo "Space name is "$space
                 mkdir /mnt/oneprovider_data/$line
+                break
+            fi
+        fi
+    done
+done
+
+for ((i=0;i<${#SPACE_NAME_ARR[@]};i++));do
+    space=${SPACE_NAME_ARR[$i]}
+    share_path=${SHARE_PATH_ARR[$i]}
+
+    for line in $ids
+    do
+        if [ $line != "," ]; then
+            space_name=`curl -u admin:password -k  "https://localhost:9443/api/v3/onepanel/provider/spaces/$line" | jq '.name' | awk -F '\"' '{print$2}'`
+
+            if [ "$space_name" == "$space" ]; then
+                echo "Space name is "$space
                 mount -t nfs $share_path /mnt/oneprovider_data/$line
                 sleep 2
                 break
