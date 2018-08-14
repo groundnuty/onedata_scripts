@@ -3,6 +3,7 @@
 apt-get update
 apt-get -y install unzip
 apt-get -y install python
+apt-get install -y jq
 
 oneprovider_version=`sed -n -e '/^ONEPROVIDER_VERSION/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
 onezone_domain=`sed -n -e '/^ONEZONE_DOMAIN/p' /tmp/user-inject.data | awk -F"=" '{print $2}'`
@@ -150,7 +151,7 @@ do
         sleep 5
     fi
 done
-
+sleep 30
 cd /home/ubuntu/onedata/scenarios/3_0_oneprovider_onezone_multihost
 
 #Start oneprovider

@@ -32,7 +32,9 @@ if [ "$1" == "1" ];then
                     mkdir -p ${mount_arr[$i]}
                     chmod 777 ${mount_arr[$i]}
                     mount -t  nfs ${share_arr[$i]} ${mount_arr[$i]}
-                else
+                fi
+                if [ "$resp" == "404" ]
+                then
                     rm -rf ${mount_arr[$i]}
                 fi
             done
@@ -54,7 +56,7 @@ if [ "$1" == "1" ];then
             share_path=${share_path_arr[$i]}
 
             resp=`curl -i -k -u admin:password https://localhost:9443/api/v3/onepanel/provider/spaces/$space | grep HTTP | awk '{print $2}'`
-            if [ "$resp" != "200" ]
+            if [ "$resp" == "404" ]
             then
                 umount "/mnt/oneprovider_data/$space"
                 rm -rf "/mnt/oneprovider_data/$space"
@@ -66,8 +68,9 @@ if [ "$1" == "1" ];then
                 sed -i "s/,sfs-nas1.eu-de.otc.t-systems.com:\/$share_path//g" $space_cofnig_file
                 sed -i "s/sfs-nas1.eu-de.otc.t-systems.com:\/$share_path,//g" $space_cofnig_file
                 sed -i "s/sfs-nas1.eu-de.otc.t-systems.com:\/$share_path//g" $space_cofnig_file
-            else
-
+            fi
+            if [ "$resp" == "200" ]
+            then
                 if [ -e "$space_cofnig_file" ];then
                     grep "$space" $space_cofnig_file > /dev/null
                     if [ "$?" == "1" ];then
